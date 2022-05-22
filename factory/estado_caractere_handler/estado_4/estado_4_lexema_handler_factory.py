@@ -27,6 +27,9 @@ from factory.estado_caractere_handler.estado_4.estado_4_lexema_eh_virgula_handle
 
 
 class Estado4LexemaHandlerFactory:
+    """
+    Esta classe recebe o lexema atual e retorna o handler que lida com o tal
+    """
 
     def __init__(self):
         self.handlers = [
@@ -47,6 +50,10 @@ class Estado4LexemaHandlerFactory:
             Estado4LexemaEhVirgulaHandler(),
         ]
 
-    def handle_lexema(self, lexema, motor_lexico):
-        handler = [handler for handler in self.handlers if handler.lexema_matches(lexema)][0]
-        return handler.handle(lexema, motor_lexico)
+    def get_lexema_handle(self, lexema):
+        """
+        Esta função recebe o lexema e retorna o handler que lidará com ele
+        :param lexema: lexema atual
+        :return: handler do lexema passado
+        """
+        return [handler for handler in self.handlers if handler.lexema_matches(lexema)][0]

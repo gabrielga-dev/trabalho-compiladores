@@ -1,5 +1,7 @@
 from domain.tipo_token import TipoToken
-
+"""
+Este arquivo guarda as palavras reservadas da linguagem
+"""
 PALAVRAS_RESERVADAS = {
         'programa': TipoToken.PROGRAMA,
         'variaveis': TipoToken.VARIAVEIS,

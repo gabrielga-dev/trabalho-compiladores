@@ -1,7 +1,16 @@
 from domain.sintatico import Sintatico
+from project_utils.mensagens_constants import MensagensConstants
 
 if __name__ == "__main__":
-    # nome = input("Entre com o nome do arquivo: ")
-        nome = 'exemplos/exemplo_1.txt'
-        parser = Sintatico()
-        parser.interpretar(nome)
+    """
+    Início de todo o funcionamento do trabalho
+    """
+    nome = 'exemplos/exemplo_1.txt'
+    parser = Sintatico()
+    valido, erros = parser.interpretar(nome)
+
+    if valido:
+        print(MensagensConstants.PROGRAMA_ACEITO)
+    else:
+        for erro in erros:
+            print(erro)

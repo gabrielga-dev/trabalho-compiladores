@@ -19,11 +19,16 @@ from factory.estado_caractere_handler.estado_1.estado_1_caractere_eh_maior_que_s
 from factory.estado_caractere_handler.estado_1.estado_1_caractere_eh_menor_que_seguido_maior_que_handler import \
     Estado1CaractereEhMenorQueSeguidoDeMaiorQueHandler
 from factory.estado_caractere_handler.estado_1.estado_1_caractere_eh_none_handler import Estado1CaractereEhNoneHandler
+from factory.estado_caractere_handler.estado_1.estado_1_caractere_eh_menor_que_seguido_de_igualdade_handler import \
+    Estado1CaractereEhMenorQueSeguidoDeIgualdadeHandler
 from factory.estado_caractere_handler.estado_1.estado_1_caractere_eh_primitivo_comum_handler import \
     Estado1CaractereEhPrimitivoComumHandler
 
 
 class Estado1CaractereHandlerFactory:
+    """
+    Essa classe realiza o tratamento em cima dos caraceters encontrados no estado 1 da análise léxica
+    """
 
     def __init__(self):
         self.handlers = [
@@ -34,6 +39,7 @@ class Estado1CaractereHandlerFactory:
             Estado1CaractereEhAlfanumericoHandler(),
             Estado1CaractereEhDigitoHandler(),
             Estado1CaractereEhDoisPontosSeguidoDeIgualdadeHandler(),
+            Estado1CaractereEhMenorQueSeguidoDeIgualdadeHandler(),
             Estado1CaractereEhMaiorQueSeguidoDeIgualdadeHandler(),
             Estado1CaractereEhMenorQueSeguidoDeMaiorQueHandler(),
             Estado1CaractereEhPrimitivoComumHandler(),
@@ -41,11 +47,21 @@ class Estado1CaractereHandlerFactory:
         ]
         self.handler_de_caractere_invalido = Estado1CaractereEhInvalidoHandler()
 
-    def handle_caractere(self, caractere, motor_lexico, set_novo_estado):
-        handlers_filtrados = [handler for handler in self.handlers if handler.caractere_matches(motor_lexico, caractere)]
+    def get_caractere_handler(self, caractere, motor_lexico):
+        """
+        Esta função recebe um caractere e retorna o handler dele
+        :param caractere: char que será usado para filtrar os handlers
+        :param motor_lexico: objeto que auxilia a análise léxica
+        :return: handler para o caractere
+        """
+        handlers_filtrados = [
+            handler
+            for handler in self.handlers
+            if handler.caractere_matches(motor_lexico, caractere)
+        ]
         handler = None
         if len(handlers_filtrados) > 0:
             handler = [handler for handler in self.handlers if handler.caractere_matches(motor_lexico, caractere)][0]
         if handler is None:
-            return self.handler_de_caractere_invalido.handle(caractere, motor_lexico, set_novo_estado)
-        return handler.handle(caractere, motor_lexico, set_novo_estado)
+            return self.handler_de_caractere_invalido
+        return handler

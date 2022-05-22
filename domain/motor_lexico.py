@@ -1,7 +1,11 @@
 from os import path
 
+from project_utils.mensagens_de_erro_constants import MensagensDeErroConstants
 
 class MotorLexico:
+    """
+    Esta classe auxilia a análise lexica com operações diretas no arquivo que contém o programa
+    """
 
     global linha
 
@@ -9,29 +13,40 @@ class MotorLexico:
         self.linha = 1
         self.path_arquivo = path_arquivo
         self.arquivo = None
-        # buffer de entrada
         self.buffer = ''
 
     def abre_arquivo(self):
+        """
+        Esta função abre o arquivo que foi passado no construtor da classe
+        :return: None
+        """
         if self.arquivo is not None:
-            print('ERRO: Arquivo ja aberto')
+            print(MensagensDeErroConstants.ERROR_MESSAGE_ARQUIVO_JA_ABERTO)
             quit()
         elif path.exists(self.path_arquivo):
             self.arquivo = open(self.path_arquivo, "r")
         else:
-            print('ERRO: Arquivo "%s" inexistente.' % self.path_arquivo)
+            print(MensagensDeErroConstants.ERROR_MESSAGE_ARQUIVO_INEXISTENTE)
             quit()
 
     def fecha_arquivo(self):
+        """
+        Esta função fecha o arquivo
+        :return: None
+        """
         if self.arquivo is None:
-            print('ERRO: Nao ha arquivo aberto')
+            print(MensagensDeErroConstants.ERROR_MESSAGE_ARQUIVO_NAO_ABERTO)
             quit()
         else:
             self.arquivo.close()
 
-    def get_char(self):
+    def get_caractere(self):
+        """
+        Esta função realiza a captura do próximo caractere no arquivo
+        :return: None
+        """
         if self.arquivo is None:
-            print('ERRO: Nao ha arquivo aberto')
+            print(MensagensDeErroConstants.ERROR_MESSAGE_ARQUIVO_NAO_ABERTO)
             quit()
         elif len(self.buffer) > 0:
             c = self.buffer[0]
@@ -48,12 +63,21 @@ class MotorLexico:
             else:
                 return c.lower()
 
-    def unget_char(self, c):
-        if c is not None:
-            self.buffer = self.buffer + c
+    def unget_caractere(self, caractere):
+        """
+        Esta função devolve o caractere passado ao buffer
+        :param caractere: caractere a ser devolvido ao buffer
+        :return: None 
+        """
+        if caractere is not None:
+            self.buffer = self.buffer + caractere
 
     def prox_char(self):
-        c = self.get_char()
-        self.unget_char(c)
-        return c
+        """
+        Esta função busca o próximo caractere
+        :return: char, o próximo caractere
+        """
+        prox_caractere = self.get_caractere()
+        self.unget_caractere(prox_caractere)
+        return prox_caractere
 

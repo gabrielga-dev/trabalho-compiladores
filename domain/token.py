@@ -1,4 +1,7 @@
 class Token:
+    """
+    Esta classe representa os tokens
+    """
     def __init__(
             self,
             linha,
@@ -22,8 +25,7 @@ class Token:
 
     def __str__(self):
         if self.erro_no_sintatico:
-            return 'Token(Erro na etapa sintática, tipo=' + self.tipo[1] + ', msg=' + self.mensagem_erro_no_sintatico\
-                   + ') '
+            return '(Erro na etapa sintática: ' + self.mensagem_erro_no_sintatico + ') '
 
-        return '\tToken(linha=' + str(self.linha) + ', tipo=' + self.tipo[1] + ', const=' + str(self.const) + ', msg=' + \
-               self.msg + ', lexema=' + self.lexema + ')'
+        return '\tlinha=' + str(self.linha) + ', const=' + str(self.const) + ', msg=' + self.msg + \
+               ', lexema=' + self.lexema + ')'

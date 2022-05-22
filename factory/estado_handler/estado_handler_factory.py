@@ -8,6 +8,9 @@ from factory.estado_handler.estado_7_handler import Estado7Handler
 
 
 class EstadoHandlerFactory:
+    """
+    Esta classe comporta todos os handlers dos estados possíveis da análise léxica
+    """
     def __init__(self):
         self.handlers = [
             Estado1Handler(),
@@ -20,5 +23,10 @@ class EstadoHandlerFactory:
         ]
 
     def get_estado_handler(self, estado):
+        """
+        Essa função recebe um estado e procura qual é o handler dele e o retorna
+        :param estado: estado pelo qual deve ser procurado o handler
+        :return: handler do estado
+        """
         handlers_filtrados = [handler for handler in self.handlers if handler.get_estado_tratado() == estado]
         return handlers_filtrados[0]

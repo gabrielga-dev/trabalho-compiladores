@@ -1,4 +1,7 @@
 class Constants:
+    """
+    Classe que comporta cosntantes da linguagem
+    """
     TAMANHO_MAXIMO_IDENTIFICADOR = 16
     CARACTERES_IGNORAVEIS = [' ', '\t', '\n']
     BARRA = '/'

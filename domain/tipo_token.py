@@ -1,4 +1,7 @@
 class TipoToken:
+    """
+    Esta classe guarda quais são os tipos de tokens possíveis
+    """
     ID = (1, 'id')
     CTE = (2, 'cte')  # numero
     CADEIA = (3, 'cadeia')
