@@ -1,3 +1,21 @@
+# Nome Discente: Gabriel Guimarães de Almeida
+# Matrícula: 0021722
+# Data: 23/05/2022
+#
+# Declaro que sou o único autor e responsável por este programa. Todas as partes do programa, exceto as que foram fornecidas
+# pelo professor ou copiadas do livro ou das bibliotecas de Aho et al., foram desenvolvidas por mim. Declaro também que
+# sou responsável por todas as eventuais cópias deste programa e que não distribui nem facilitei a distribuição de cópias.
+#
+# O arquivo lexico.py comporta a implementação necessária de um analisador sintático para a linguagem do trabalho prático.
+# A classe Sintatico é responsável pela análise sintática do compilador. Suas funções principais são: interpretar(), a qual
+# recebe o path do arquivo que possui o código a ser analisado, e a função consome(), que é responsável por consumir os
+# não-terminais da gramatica e verificar a existência de erros.
+#
+# Referências bibliográficas:
+# Exemplos enviados pelo professor Mário
+# Repositório de uma aula de SOLID feita pelo próprio Discente: https://github.com/gabrielga-dev/aula-de-SOLID
+# AHO, A. V. et al. Compiladores. 2 ed. São Paulo: Pearson Addison-Wesley, 2008.
+
 from domain.lexico import Lexico
 from domain.motor_lexico import MotorLexico
 from domain.tipo_token import TipoToken
@@ -16,6 +34,7 @@ class Sintatico:
         self.lexico = None
         self.motor_lexico = None
         self.token_atual = None
+        self.buffer_de_token = None
 
     def interpretar(self, path_arquivo):
         """
@@ -54,7 +73,10 @@ class Sintatico:
         :param tipo_token: TipoToken a ser verificado
         :return: Booleano
         """
-        (const, msg) = tipo_token
+        try:
+            (const, msg) = tipo_token
+        except:
+            const = tipo_token.const
         return self.token_atual.const == const
 
     def consome(self, tipo_token):
@@ -65,17 +87,28 @@ class Sintatico:
         :return:
         """
         if self.atual_igual(tipo_token):
-            self.token_atual = self.get_token()
+            # se tiver algum token no buffer, ele é consumido
+            if self.buffer_de_token is not None:
+                self.token_atual = self.buffer_de_token
+                self.buffer_de_token = None
+            else:
+                self.token_atual = self.get_token()
         else:
+            (const, mensagem) = tipo_token
             self.erros.append(
-                Token(
+                'ERRO NO SINTÁTICO! (Linha %d) Caractere inesperado. Esperado: %s, Recebido: %s' % (
                     self.token_atual.linha,
-                    TipoToken.ERROR,
-                    '[' + self.token_atual.lexema + ']',
-                    'Caracter inesperado. Esperado: ' + tipo_token[1] + ' Recebido: ' + self.token_atual.lexema
+                    mensagem,
+                    self.token_atual.lexema
                 )
             )
-            self.token_atual = self.get_token()
+            token = self.get_token()
+            if const == token.const:
+                # se próximo token é igual ao que foi consumido, então ele é ignorado e a execução continua
+                self.token_atual = self.get_token()
+            else:
+                # e próximo token não é igual ao que foi consumido, guarda ele no buffer de tokens
+                self.buffer_de_token = token
 
     def PROG(self):
         """
@@ -157,8 +190,14 @@ class Sintatico:
             self.consome(TipoToken.REAL)
         elif self.atual_igual(TipoToken.LOGICO):
             self.consome(TipoToken.LOGICO)
-        else:
+        elif self.atual_igual(TipoToken.CARACTER):
             self.consome(TipoToken.CARACTER)
+        else:
+            self.erros.append(
+                'ERRO NO SINTÁTICO! (linha %d): Era esperado uma tipagem.' % (
+                    self.token_atual.linha
+                )
+            )
 
     def C_COMP(self):
         """
@@ -207,15 +246,10 @@ class Sintatico:
         elif self.atual_igual(TipoToken.ID):
             self.ATRIB()
         else:
-            self.erros.append(
-                Token(
-                    None,
-                    TipoToken.ERROR,
-                    None,
-                    erro_no_sintatico=True,
-                    mensagem_erro_no_sintatico=ERRO_AO_TENTAR_CONSUMIR(None)
+            self.erros.append('ERRO NO SINTÁTICO! (linha %d): COMANDOS não foi encontrado encontrados' % (
+                    self.token_atual.linha
                 )
-            )
+          )
 
     def IF(self):
         """
@@ -238,7 +272,14 @@ class Sintatico:
             self.consome(TipoToken.SENAO)
             self.C_COMP()
         else:
-            pass
+            self.erros.append(
+                'ERRO NO SINTÁTICO! (linha %d): Esperado: %s, Recebido: %s' % (
+                    self.token_atual.linha,
+                    TipoToken.SENAO[1],
+                    self.token_atual.lexema
+                )
+            )
+            self.C_COMP()
 
     def WHILE(self):
         """
@@ -391,12 +432,8 @@ class Sintatico:
             self.FAT()
         else:
             self.erros.append(
-                Token(
-                    None,
-                    TipoToken.ERROR,
-                    None,
-                    erro_no_sintatico=True,
-                    mensagem_erro_no_sintatico=ERRO_AO_TENTAR_CONSUMIR('FAT')
+                'ERRO NO SINTÁTICO! (linha %d) Argumentos não encontrados' % (
+                    self.token_atual.linha
                 )
             )
 
@@ -407,7 +444,12 @@ class Sintatico:
         """
         new_token = self.lexico.get_token(self.motor_lexico)
         if new_token.tipo == TipoToken.ERROR:
-            self.erros.append(new_token)
+            self.erros.append(
+                'ERRO NO LÉXICO! (linha %d): %s' % (
+                    new_token.linha, new_token.msg
+                )
+            )
+            # aqui entra o MODO PÂNICO
             return self.get_token()
         else:
             return new_token
